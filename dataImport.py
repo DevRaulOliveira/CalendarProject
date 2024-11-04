@@ -1,27 +1,24 @@
-import pandas as pd #import da planilha excel
-import boto3 as bt
+import pandas as pd  # Import da planilha Excel
+import boto3
 import requests
-from io import BytesIO
+from io import StringIO
 
-# Localizacao do arquivo no GitHub
-url = 'https://github.com/DevRaulOliveira/CalendarProject/blob/Main/Documents/ListaFeriados.xlsx'
-
+url ='https://github.com/DevRaulOliveira/CalendarProject/blob/Main/Documents/ListFerComp.csv'
 response = requests.get(url)
-file = BytesIO(response.content)
+file = StringIO(response.content.decode('utf-8'))
 
-# Conexao com o dynamoDb
-dynamodb = bt.resource('dynamodb', region_name='sa-east-1')
+file_path = 'ListFerComp.csv'
+df = pd.read_csv(file)
+
+dynamodb= boto3.resource('dynamodb', region_name='sa-east-1')
 tabela = dynamodb.Table('cadFeriado')
 
-# Ler arquivo excel
-df = pd.read_excel('https://github.com/DevRaulOliveira/CalendarProject/raw/Main/Documents/ListaFeriados.xlsx', engine='openpyxl')
-
-
-# Inserir dados no dynamoDb
+# Função para inserir itens no DynamoDB
 def inserir_item(item):
     tabela.put_item(Item=item)
 
-for index, row in df.interrows():
+# Loop corrigido para iterar sobre as linhas do DataFrame e inserir dados
+for index, row in df.iterrows():
     item = {
         'codUf': int(row['COD_UF']),
         'uf': row['UF'],
@@ -29,8 +26,7 @@ for index, row in df.interrows():
         'codMun': int(row['COD_MUN']),
         'municipio': row['MUNICIPIO'],
         'feriado': row['FERIADO'],
-        'data': row ['DATA']
+        # Converter o tipo Timestamp para string no formato ISO 8601
+        'data': row['DATA'].isoformat() if not pd.isnull(row['DATA']) else None
     }
-    inserir_item
-
-print("Dados importados com sucesso!")
+    inserir_item(item)
