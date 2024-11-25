@@ -12,3 +12,7 @@ Está em fase de migração para uma tabela em Cloud, utilizando o serviço da A
 ## Base de dados
 
 A base de dados da tabela de feriados, poderá possuir **uma dimensão de 7MB** de tamanho, sendo uma tabela leve e podendo ser armazenada utilizando recursos gratuitos.
+
+## Queries
+
+As queries do projeto Calendar estão salvas na pasta desse repositório ------. Todas as Queries foram desenvolvidas utilizando como base o Oracle SQL, tendo em vista que esse é o banco de dados que irá armazenar as informações, a versão do **Oracle é a 23.1.1**.
